@@ -1,7 +1,9 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="LineCounter.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Exclude" Type="System.String" Scope="User">
+      <Value Profile="(Default)">bin obj .svn .class .exe .dll .ocx .ico .jpg .jpeg .png .bmp .pdf .metadata .settings build thumbs.db .doc .docx .xls .xlsx .zip .jar .cab .lzh .pfx</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

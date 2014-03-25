@@ -13,5 +13,9 @@ namespace LineCounter
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            Exit += (o, e) => LineCounter.Properties.Settings.Default.Save();
+        }
     }
 }

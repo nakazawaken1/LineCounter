@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -23,24 +24,31 @@ namespace LineCounter
     public partial class ResultWindow : Window
     {
         public static ObservableCollection<Row> Rows = new ObservableCollection<Row>();
+
         public ResultWindow()
         {
             InitializeComponent();
         }
-        public string Setup(ObservableCollection<Row> rows, IEnumerable<string> list, IEnumerable<string> exclude, bool first = true)
+
+        public static string Setup(BackgroundWorker worker, ICollection<Row> rows, IEnumerable<string> list, IEnumerable<string> exclude, bool first = true)
         {
             if (first) rows.Clear();
+            var max = list.Count();
+            var count = 0;
             foreach (var i in list)
             {
+                if (worker.CancellationPending) return null;
                 if (exclude.Any(j => i.EndsWith(j, StringComparison.CurrentCultureIgnoreCase))) continue;
                 if (System.IO.Directory.Exists(i))
                 {
-                    Setup(rows, System.IO.Directory.EnumerateFileSystemEntries(i), exclude, false);
+                    if(Setup(worker, rows, System.IO.Directory.EnumerateFileSystemEntries(i), exclude, false) == null) return null;
                 }
                 else if(!rows.Any(j => j.Path == i))
                 {
                     rows.Add(new Row(i));
                 }
+                count++;
+                if (first) worker.ReportProgress(count * 100 / max, string.Format("{0:#,0}ファイル {1:#,0}行", rows.Count, rows.Aggregate(0L, (s, r) => s += r.Count)));
             }
             return string.Format("全 {0:#,0}ファイル {1:#,0}行", rows.Count, rows.Aggregate(0L, (s, r) => s += r.Count));
         }
@@ -61,6 +69,7 @@ namespace LineCounter
                     break;
             }
         }
+
         public static string ToText(IEnumerable<Row> rows, string separator)
         {
             var text = new StringBuilder();
@@ -76,6 +85,7 @@ namespace LineCounter
             Process.Start(((Row)((DataGridRow)sender).Item).Path);
         }
     }
+
     public class Row
     {
         public Row(string path)

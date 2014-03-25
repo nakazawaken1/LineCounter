@@ -22,10 +22,12 @@ namespace LineCounter
     public partial class MainWindow : Window
     {
         public static ObservableCollection<string> Paths = new ObservableCollection<string>();
+
         public MainWindow()
         {
             InitializeComponent();
         }
+
         private void ListBoxPaths_DoubleClick(object o, EventArgs e)
         {
             Paths.Remove(((ListBoxItem)o).Content as string).ToString();
@@ -53,9 +55,19 @@ namespace LineCounter
                     }
                     var result = App.Current.Windows.OfType<ResultWindow>().FirstOrDefault();
                     if (result == null) result = new ResultWindow();
-                    result.Owner = this;
-                    result.Title = result.Setup(ResultWindow.Rows, Paths, TextBoxExclude.Text.Split(new char[] { ' ', '　' }, StringSplitOptions.RemoveEmptyEntries));
-                    result.ShowDialog();
+                    var rows = new List<Row>();
+                    var title = string.Empty;
+                    ProgressWindow.Start(this, worker => title = ResultWindow.Setup(worker, rows, Paths, Properties.Settings.Default.Exclude.Split(new char[] { ' ', '　' }, StringSplitOptions.RemoveEmptyEntries))
+                    , cancel => {
+                        if (!cancel)
+                        {
+                            result.Title = title;
+                            ResultWindow.Rows.Clear();
+                            foreach (var i in rows) ResultWindow.Rows.Add(i);
+                            result.Owner = this;
+                            result.ShowDialog();
+                        }
+                    });
                     break;
                 case "一覧クリア":
                     Paths.Clear();
@@ -63,6 +75,14 @@ namespace LineCounter
                 default:
                     Close();
                     break;
+            }
+        }
+
+        private void Label_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if(MessageBox.Show("除外する名前を初期設定に戻します。よろしいですか？", "確認", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            {
+                Properties.Settings.Default.Reset();
             }
         }
     }

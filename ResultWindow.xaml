@@ -5,10 +5,12 @@
         Title="ResultWindow" Height="600" Width="800">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="0.05*"/>
             <RowDefinition/>
             <RowDefinition Height="0.1*"/>
         </Grid.RowDefinitions>
-        <DataGrid x:Name="DataGridResult" ItemsSource="{x:Static me:ResultWindow.Rows}" AutoGenerateColumns="False" ClipboardCopyMode="IncludeHeader" SelectionMode="Single">
+        <TextBlock VerticalAlignment="Center">※行をダブルクリックするとファイルが開きます。</TextBlock>
+        <DataGrid Grid.Row="1" x:Name="DataGridResult" ItemsSource="{x:Static me:ResultWindow.Rows}" AutoGenerateColumns="False" ClipboardCopyMode="IncludeHeader" SelectionMode="Single">
             <DataGrid.ItemContainerStyle>
                 <Style TargetType="DataGridRow">
                     <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick"/>
@@ -27,7 +29,7 @@
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
