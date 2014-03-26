@@ -45,7 +45,7 @@ namespace LineCounter
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            switch(((Button)sender).Content as string)
+            switch (((Button)sender).Content as string)
             {
                 case "行カウント開始":
                     if (Paths.Count <= 0)
@@ -56,17 +56,24 @@ namespace LineCounter
                     var result = App.Current.Windows.OfType<ResultWindow>().FirstOrDefault();
                     if (result == null) result = new ResultWindow();
                     var rows = new List<Row>();
-                    var title = string.Empty;
-                    ProgressWindow.Start(this, worker => title = ResultWindow.Setup(worker, rows, Paths, Properties.Settings.Default.Exclude.Split(new char[] { ' ', '　' }, StringSplitOptions.RemoveEmptyEntries))
-                    , cancel => {
-                        if (!cancel)
+                    var excludeRows = new List<Row>();
+                    ProgressWindow.Start(this, "行数を数えています...", false, worker => ResultWindow.Setup(worker, rows, excludeRows, Paths, Properties.Settings.Default.Exclude.Split(new char[] { ' ', '　' }, StringSplitOptions.RemoveEmptyEntries))
+                    , r =>
+                    {
+                        if (r.Cancelled) return;
+                        if (r.Error != null)
                         {
-                            result.Title = title;
-                            ResultWindow.Rows.Clear();
-                            foreach (var i in rows) ResultWindow.Rows.Add(i);
-                            result.Owner = this;
-                            result.ShowDialog();
+                            MessageBox.Show("途中で失敗しました。 - " + r.Error);
                         }
+                        result.Title = r.Result as string;
+                        ResultWindow.Rows.Clear();
+                        foreach (var i in rows) ResultWindow.Rows.Add(i);
+                        ResultWindow.ExcludeRows.Clear();
+                        foreach (var i in excludeRows) ResultWindow.ExcludeRows.Add(i);
+                        result.Owner = this;
+                        IsEnabled = false;
+                        result.ShowDialog();
+                        IsEnabled = true;
                     });
                     break;
                 case "一覧クリア":
@@ -80,7 +87,7 @@ namespace LineCounter
 
         private void Label_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if(MessageBox.Show("除外する名前を初期設定に戻します。よろしいですか？", "確認", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            if (MessageBox.Show("除外する名前を初期設定に戻します。よろしいですか？", "確認", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
             {
                 Properties.Settings.Default.Reset();
             }

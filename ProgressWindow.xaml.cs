@@ -38,23 +38,32 @@ namespace LineCounter
             worker.CancelAsync();
         }
 
-        public static void Start(Window owner, Action<BackgroundWorker> task, Action<bool> completed)
+        /// <summary>
+        /// プログレスダイアログ表示
+        /// </summary>
+        /// <param name="owner">親ウインドウ</param>
+        /// <param name="title">タイトル</param>
+        /// <param name="progress">true:進捗率を表示する、false:しない</param>
+        /// <param name="task">処理(この中ではUIにはアクセスできない。キャンセルはBackgroundWorker.CancellationPendingでチェック、進捗はBackgroundWorker.ReportProgress(進捗率[progress=falseのときは0], メッセージ)で通知)</param>
+        /// <param name="completed">完了時処理(キャンセルされたかどうかはRunWorkerCompletedEventArgs.Cancelled、処理の結果はRunWorkerCompletedEventArgs.Result、例外発生時はRunWorkerCompletedEventArgs.Errorにセットされる)</param>
+        public static void Start(Window owner, string title, bool progress, Func<BackgroundWorker, object> task, Action<RunWorkerCompletedEventArgs> completed)
         {
-            var window = new ProgressWindow { Owner = owner, Topmost = true };
+            var window = new ProgressWindow { Owner = owner, Title = title };
+            window.progressBar.IsIndeterminate = !progress;
             window.worker.DoWork += (o, e) =>
             {
                 var worker = (BackgroundWorker)o;
-                task(worker);
+                e.Result = task(worker);
                 e.Cancel = worker.CancellationPending;
             };
             window.worker.RunWorkerCompleted += (o, e) =>
             {
                 window.Close();
                 owner.IsEnabled = true;
-                completed(e.Cancelled);
+                completed(e);
             };
-            window.Show();
             owner.IsEnabled = false;
+            window.Show();
             window.worker.RunWorkerAsync();
         }
     }
