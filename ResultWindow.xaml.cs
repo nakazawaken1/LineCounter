@@ -61,7 +61,7 @@ namespace LineCounter
                     Clipboard.SetText(ToText(Rows, "\t", "対象") + ToText(ExcludeRows, "\t", "除外"));
                     break;
                 case "CSVで保存":
-                    var dialog = new SaveFileDialog { FileName = "line_count.tsv", DefaultExt = ".csv", Filter = "CSV形式 (.csv)|*.csv" };
+                    var dialog = new SaveFileDialog { FileName = "line_count.csv", DefaultExt = ".csv", Filter = "CSV形式 (.csv)|*.csv" };
                     if (dialog.ShowDialog() ?? false) System.IO.File.WriteAllText(dialog.FileName, ToText(Rows, ",", "対象") + ToText(ExcludeRows, ",", "除外"));
                     break;
                 default:
@@ -70,7 +70,7 @@ namespace LineCounter
             }
         }
 
-        public static string ToText(IEnumerable<Row> rows, string separator, string header)
+        public static string ToText(IEnumerable<Row> rows, string separator, string header = null)
         {
             var text = new StringBuilder();
             foreach (var i in rows)
