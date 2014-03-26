@@ -40,7 +40,7 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="サイズ(B)" Binding="{Binding Size,StringFormat={}{0:N0}}" IsReadOnly="True">
+                        <DataGridTextColumn Header="サイズ(Byte)" Binding="{Binding Size,StringFormat={}{0:N0}}" IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}" >
                                     <Setter Property="Margin" Value="3,0" />
@@ -66,7 +66,7 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="パス" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="種類" Binding="{Binding Type}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="サイズ(B)" Binding="{Binding Size,StringFormat={}{0:N0}}" IsReadOnly="True">
+                        <DataGridTextColumn Header="サイズ(Byte)" Binding="{Binding Size,StringFormat={}{0:N0}}" IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}" >
                                     <Setter Property="Margin" Value="3,0" />

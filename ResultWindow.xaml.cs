@@ -62,7 +62,15 @@ namespace LineCounter
                     break;
                 case "CSVで保存":
                     var dialog = new SaveFileDialog { FileName = "line_count.csv", DefaultExt = ".csv", Filter = "CSV形式 (.csv)|*.csv" };
-                    if (dialog.ShowDialog() ?? false) System.IO.File.WriteAllText(dialog.FileName, ToText(Rows, ",", "対象") + ToText(ExcludeRows, ",", "除外"));
+                    if (dialog.ShowDialog() ?? false)
+                    {
+                        var separator = ",";
+                        Func<string, string> format = s => '"' + s.Replace("\"", "\"\"") + '"';
+                        var text = new StringBuilder(format("対象／除外"));
+                        foreach (var i in DataGridResult.Columns) text.Append(separator).Append(format(i.Header.ToString()));
+                        text.AppendLine();
+                        System.IO.File.WriteAllText(dialog.FileName, text + ToText(Rows, separator, "対象", format) + ToText(ExcludeRows, separator, "除外", format), Encoding.Default);
+                    }
                     break;
                 default:
                     Close();
@@ -70,16 +78,17 @@ namespace LineCounter
             }
         }
 
-        public static string ToText(IEnumerable<Row> rows, string separator, string header = null)
+        public static string ToText(IEnumerable<Row> rows, string separator, string header = null, Func<string, string> format = null)
         {
             var text = new StringBuilder();
+            if (format == null) format = s => s;
             foreach (var i in rows)
             {
-                if (header != null) text.Append(header).Append(separator);
-                text.Append(i.Path).Append(separator)
-                    .Append(i.Type).Append(separator)
-                    .Append(i.Count.HasValue ? i.Count.ToString() : string.Empty).Append(separator)
-                    .AppendLine(i.Size.HasValue ? i.Size.ToString() : string.Empty);
+                if (header != null) text.Append(format(header)).Append(separator);
+                text.Append(format(i.Path)).Append(separator)
+                    .Append(format(i.Type)).Append(separator)
+                    .Append(format(i.Count.HasValue ? i.Count.ToString() : string.Empty)).Append(separator)
+                    .AppendLine(format(i.Size.HasValue ? i.Size.ToString() : string.Empty));
             }
             return text.ToString();
         }
